@@ -1,0 +1,56 @@
+node {
+	echo "================================================================================================="
+	echo 'Checking out the code'
+   
+    stage('checkout') {
+	 git url: 'https://github.com/mailtorajit/couponapp.git'
+    // some block
+	echo 'checkedout the code'
+	echo "================================================================================================="
+	}
+	stage('compile'){
+		echo "================================================================================================="
+		echo "Compling the code"
+		echo "PATH = ${PATH}"
+		bat 'mvn compile'
+		echo "================================================================================================="
+	}
+	stage('SonarQube analysis') {
+		echo "================================================================================================="
+       	def scannerHome = tool 'My SonarQube Server';
+       	echo "Scanner home is"
+		echo scannerHome
+		//https://blog.sonarsource.com/breaking-the-sonarqube-analysis-with-jenkins-pipelines/
+     	withSonarQubeEnv('SonarQube Scanner') {
+        bat "${scannerHome}/bin/sonar-scanner.bat"
+        echo "=================================================================================================" 
+    	}
+	}
+	
+	sleep(10)
+	 stage("SonarQube Quality Gate") {
+	 	echo "=================================================================================================" 
+        timeout(time: 30, unit: 'SECONDS') { 
+           def qg = waitForQualityGate() 
+           if (qg.status != 'OK') {
+             error "Pipeline aborted due to quality gate failure: ${qg.status}"
+           }
+        }
+        echo "================================================================================================="
+    }
+    step([$class: 'JacocoPublisher',
+      execPattern:'**/**.exec',
+      classPattern: '**/classes',
+      sourcePattern: '**/src/main/java'])
+      
+	stage('test execute'){
+		echo 'inside test'
+		bat 'mvn test -Dmaven.compile.skip=true'
+	}
+   	stage('deploy') {
+    	// some block
+    	echo 'inside deploy'
+    	bat 'mvn deploy -Dmaven.compile.skip=true -Dmaven.test.skip=true'
+	}
+
+}
