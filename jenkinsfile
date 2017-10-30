@@ -23,7 +23,7 @@ node {
 		echo "================================================================================================="
 	}
 	stage('SonarQube analysis') {
-		echo "====================================sonarqube analysis started============================================="
+		echo "================================================================================================="
        	def scannerHome = tool 'My SonarQube Server';
        	echo "Scanner home is"
 		echo scannerHome
@@ -33,9 +33,16 @@ node {
         echo "=================================================================================================" 
     	}
 	}
+	//stage('publish unit test coverage') {
+		//echo "================================================================================================="
+        //junit 'test-output/junitreports/*.xml'
+        //step( [ $class: 'JacocoPublisher' ] )
+        //echo "================================================================================================="
+    
+//}
 	sleep(10)
 	 stage("SonarQube Quality Gate") {
-	 	echo "===========================check sonar quality gate==================================================" 
+	 	echo "=================================================================================================" 
         timeout(time: 30, unit: 'SECONDS') { 
            def qg = waitForQualityGate() 
            if (qg.status != 'OK') {
@@ -44,15 +51,16 @@ node {
         }
         echo "================================================================================================="
     }
-    step([$class: 'JacocoPublisher',
-      execPattern:'**/**.exec',
-      classPattern: '**/target/classes',
-      sourcePattern: '**/src/main/java'])
-      
+    
 	stage('test execute'){
 		echo 'inside test'
 		bat 'mvn test -Dmaven.compile.skip=true'
 	}
+	step([$class: 'JacocoPublisher',
+      execPattern:'**/target/coverage-reports/*.exec',
+      classPattern: '**/classes',
+      sourcePattern: '**/src/main/java'])
+      
    	stage('deploy') {
     	// some block
     	echo 'inside deploy'
