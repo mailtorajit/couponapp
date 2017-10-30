@@ -1,5 +1,5 @@
 node {
-	echo "================================================================================================="
+	echo "===========================checking out the code==================================================="
 	echo 'Checking out the code'
    
     stage('checkout') {
@@ -8,15 +8,22 @@ node {
 	echo 'checkedout the code'
 	echo "================================================================================================="
 	}
-	stage('compile'){
-		echo "================================================================================================="
-		echo "Compling the code"
+	stage('clean project'){
+		echo "=============================cleaning the project======================================================="
 		echo "PATH = ${PATH}"
+    	//echo "M2_HOME = ${M2_HOME}"
+		bat 'mvn clean'
+		echo "================================================================================================="
+	}
+	stage('compile'){
+		echo "==============================compiling the project================================================="
+		echo "PATH = ${PATH}"
+    	//echo "M2_HOME = ${M2_HOME}"
 		bat 'mvn compile'
 		echo "================================================================================================="
 	}
 	stage('SonarQube analysis') {
-		echo "================================================================================================="
+		echo "====================================sonarqube analysis started============================================="
        	def scannerHome = tool 'My SonarQube Server';
        	echo "Scanner home is"
 		echo scannerHome
@@ -26,10 +33,9 @@ node {
         echo "=================================================================================================" 
     	}
 	}
-	
 	sleep(10)
 	 stage("SonarQube Quality Gate") {
-	 	echo "=================================================================================================" 
+	 	echo "===========================check sonar quality gate==================================================" 
         timeout(time: 30, unit: 'SECONDS') { 
            def qg = waitForQualityGate() 
            if (qg.status != 'OK') {
@@ -38,17 +44,15 @@ node {
         }
         echo "================================================================================================="
     }
+    step([$class: 'JacocoPublisher',
+      execPattern:'**/**.exec',
+      classPattern: '**/target/classes',
+      sourcePattern: '**/src/main/java'])
       
 	stage('test execute'){
 		echo 'inside test'
 		bat 'mvn test -Dmaven.compile.skip=true'
 	}
-	
-	step([$class: 'JacocoPublisher',
-      execPattern:'**/**.exec',
-      classPattern: '**/classes',
-      sourcePattern: '**/src/main/java'])
-	  
    	stage('deploy') {
     	// some block
     	echo 'inside deploy'
