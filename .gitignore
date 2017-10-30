@@ -1,5 +1,5 @@
-target/*
+target
 test-output/
-Logger_Log4j.log
+*.log
 /target/*
-/Logger_Log4j.log
+Logger_Log4j.log
