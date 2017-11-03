@@ -77,7 +77,8 @@
 		<dependency>
 			<groupId>commons-collections</groupId>
 			<artifactId>commons-collections</artifactId>
-			</dependency>
+			<version>3.2.2</version>
+		</dependency>
 		<dependency>
 			<groupId>org.sonarsource.java</groupId>
 			<artifactId>sonar-jacoco-listeners</artifactId>
@@ -87,12 +88,18 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			</dependency>
+			<version>4.8.1</version>
+		</dependency>
 		<dependency>
+
 			<groupId>org.codehaus.sonar-plugins.java</groupId>
+
 			<artifactId>sonar-jacoco-listeners</artifactId>
+
 			<version>1.4</version>
+
 			<scope>test</scope>
+
 		</dependency>
 	</dependencies>
 
@@ -137,63 +144,35 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.2.201409121644</version>
+
 				<configuration>
 					<destFile>${basedir}/target/coverage-reports/jacoco-unit.exec</destFile>
 					<dataFile>${basedir}/target/coverage-reports/jacoco-unit.exec</dataFile>
 				</configuration>
 				<executions>
-
-					<!-- Prepares a variable, jacoco.agent.ut.arg, that contains the info 
-						to be passed to the JVM hosting the code being tested. -->
-
 					<execution>
-
-						<id>prepare-ut-agent</id>
-
-						<phase>process-test-classes</phase>
-
+						<id>jacoco-initialize</id>
 						<goals>
-
 							<goal>prepare-agent</goal>
-
 						</goals>
-
-						<configuration>
-
-							<destFile>${sonar.jacoco.reportPaths}</destFile>
-
-							<propertyName>jacoco.agent.ut.arg</propertyName>
-
-							<append>true</append>
-
-						</configuration>
-
 					</execution>
-
-					<!-- Prepares a variable, jacoco.agent.it.arg, that contains the info 
-						to be passed to the JVM hosting the code being tested. -->
-
 					<execution>
-
-						<id>prepare-it-agent</id>
-
-						<phase>pre-integration-test</phase>
-
+						<id>jacoco-site</id>
+						<phase>package</phase>
 						<goals>
-
-							<goal>prepare-agent</goal>
-
+							<goal>report</goal>
 						</goals>
-
+					</execution>
+					<execution>
+						<id>prepare-ut-agent</id>
+						<phase>process-test-classes</phase>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
 						<configuration>
-
-							<destFile>${sonar.jacoco.itReportPath}</destFile>
-
-							<propertyName>jacoco.agent.it.arg</propertyName>
-
+							<destFile>${sonar.jacoco.reportPath}</destFile>
+							<propertyName>jacoco.agent.ut.arg</propertyName>
 							<append>true</append>
-
 						</configuration>
 
 					</execution>
