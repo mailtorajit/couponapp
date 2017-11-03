@@ -24,20 +24,15 @@ node {
 	}
 	
 	stage('test execute'){
+		echo "==============================Exceuting the tests================================================="
 		echo 'inside test'
 		bat 'mvn test -Dmaven.compile.skip=true'
+		echo "================================================================================================="
 	}
-	step([$class: 'JacocoPublisher',
-      execPattern:'**/target/coverage-reports/*.exec',
-      classPattern: '**/classes',
-      sourcePattern: '**/src/main/java'])
-      
-      
+	
 	stage('SonarQube analysis') {
 		echo "================================================================================================="
        	def scannerHome = tool 'My SonarQube Server';
-       	echo "Scanner home is"
-		echo scannerHome
 		//https://blog.sonarsource.com/breaking-the-sonarqube-analysis-with-jenkins-pipelines/
      	withSonarQubeEnv('SonarQube Scanner') {
         bat "${scannerHome}/bin/sonar-scanner.bat"
@@ -57,11 +52,19 @@ node {
         echo "================================================================================================="
     }
     
+    stage('publish test results'){
+    	echo "===========================Publishing the results============================================="
+	  	step([$class: 'JacocoPublisher',
+      	execPattern:'**/target/coverage-reports/*.exec',
+      	classPattern: '**/classes',
+      	sourcePattern: '**/src/main/java'])
+      	echo "================================================================================================="
+	}
 	
    	stage('deploy') {
-    	// some block
-    	echo 'inside deploy'
+    	echo "=========================Deploying the project========================================================"
     	bat 'mvn deploy -Dmaven.compile.skip=true -Dmaven.test.skip=true'
+    	echo "================================================================================================="
 	}
 
 }
