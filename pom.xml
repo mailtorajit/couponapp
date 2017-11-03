@@ -91,7 +91,7 @@
 			<version>4.8.1</version>
 		</dependency>
 	</dependencies>
-	
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -133,76 +133,73 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-
+				<version>0.7.2</version>
 				<configuration>
 					<destFile>${basedir}/target/coverage-reports/jacoco-unit.exec</destFile>
 					<dataFile>${basedir}/target/coverage-reports/jacoco-unit.exec</dataFile>
 				</configuration>
-				                <executions>
+				<executions>
 
-                    <!-- Prepares a variable, jacoco.agent.ut.arg, that contains the info 
+					<!-- Prepares a variable, jacoco.agent.ut.arg, that contains the info 
+						to be passed to the JVM hosting the code being tested. -->
 
-                        to be passed to the JVM hosting the code being tested. -->
+					<execution>
 
-                    <execution>
+						<id>prepare-ut-agent</id>
 
-                        <id>prepare-ut-agent</id>
+						<phase>process-test-classes</phase>
 
-                        <phase>process-test-classes</phase>
+						<goals>
 
-                        <goals>
+							<goal>prepare-agent</goal>
 
-                            <goal>prepare-agent</goal>
+						</goals>
 
-                        </goals>
+						<configuration>
 
-                        <configuration>
+							<destFile>${sonar.jacoco.reportPaths}</destFile>
 
-                            <destFile>${sonar.jacoco.reportPaths}</destFile>
+							<propertyName>jacoco.agent.ut.arg</propertyName>
 
-                            <propertyName>jacoco.agent.ut.arg</propertyName>
+							<append>true</append>
 
-                            <append>true</append>
+						</configuration>
 
-                        </configuration>
+					</execution>
 
-                    </execution>
+					<!-- Prepares a variable, jacoco.agent.it.arg, that contains the info 
+						to be passed to the JVM hosting the code being tested. -->
 
-                    <!-- Prepares a variable, jacoco.agent.it.arg, that contains the info 
+					<execution>
 
-                        to be passed to the JVM hosting the code being tested. -->
+						<id>prepare-it-agent</id>
 
-                    <execution>
+						<phase>pre-integration-test</phase>
 
-                        <id>prepare-it-agent</id>
+						<goals>
 
-                        <phase>pre-integration-test</phase>
+							<goal>prepare-agent</goal>
 
-                        <goals>
+						</goals>
 
-                            <goal>prepare-agent</goal>
+						<configuration>
 
-                        </goals>
+							<destFile>${sonar.jacoco.itReportPath}</destFile>
 
-                        <configuration>
+							<propertyName>jacoco.agent.it.arg</propertyName>
 
-                            <destFile>${sonar.jacoco.itReportPath}</destFile>
+							<append>true</append>
 
-                            <propertyName>jacoco.agent.it.arg</propertyName>
+						</configuration>
 
-                            <append>true</append>
-
-                        </configuration>
-
-                    </execution>
-
-                </executions>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<!-- Minimal supported version is 2.4 -->
-				
+
 				<configuration>
 					<properties>
 						<property>
@@ -211,7 +208,7 @@
 						</property>
 					</properties>
 				</configuration>
-				
+
 			</plugin>
 		</plugins>
 	</build>
